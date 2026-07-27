@@ -26,6 +26,7 @@ com\dbtraining\reconx\model\BondTrade$Builder.class
 com\dbtraining\reconx\controller\TradeController.class
 com\dbtraining\reconx\model\EquityTrade.class
 com\dbtraining\reconx\model\TradeType.class
+com\dbtraining\reconx\observability\KafkaHealthIndicator.class
 com\dbtraining\reconx\repository\entity\AppUser.class
 com\dbtraining\reconx\repository\TradeRepository.class
 com\dbtraining\reconx\service\InstrumentService.class
