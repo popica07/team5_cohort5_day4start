@@ -85,10 +85,12 @@ public class TradeService {
 
     @Transactional(readOnly = true)
     public Page<Trade> list(LocalDate from, LocalDate to, String status, Long counterpartyId, Pageable pageable) {
-        // TODO(TICKET-ADV055 + TICKET-ADV056): combine the static helpers from
-        //   TradeSpecifications (hasStatus, tradeDateBetween, hasCounterparty)
-        //   via Specification.where(...).and(...) and call
-        //   tradeRepo.findAll(spec, pageable). Until JPA is in place, throw.
-        throw new UnsupportedOperationException("TICKET-ADV055");
+        // Each factory returns cb.conjunction() for a null filter, so the three
+        // compose unconditionally — no null-checks and no deprecated
+        // Specification.where() (removed-for-deletion in Spring Data JPA 3.5).
+        Specification<Trade> spec = tradeDateBetween(from, to)
+                .and(hasStatus(status))
+                .and(hasCounterparty(counterpartyId));
+        return tradeRepo.findAll(spec, pageable);
     }
 }
