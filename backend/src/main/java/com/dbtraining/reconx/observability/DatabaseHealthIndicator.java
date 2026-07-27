@@ -5,6 +5,8 @@ import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
+import java.sql.*;
+import java.time.Duration;
 
 /**
  * ============================================================================
@@ -33,16 +35,33 @@ import javax.sql.DataSource;
  *        converts it to DOWN with the exception class as a detail.
  * ============================================================================
  */
-@Component("database")
+@Component("reconxDatabase")
 public class DatabaseHealthIndicator extends AbstractHealthIndicator {
 
-    private final DataSource ds;
+    private static final Duration TIMEOUT = Duration.ofSeconds(2);
 
-    public DatabaseHealthIndicator(DataSource ds) { this.ds = ds; }
+    private final DataSource dataSource;
+
+    public DatabaseHealthIndicator(DataSource dataSource) {
+        super("ReconX database health check failed");
+        this.dataSource = dataSource;
+    }
 
     @Override
     protected void doHealthCheck(Health.Builder builder) throws Exception {
-        // TODO(TICKET-ADV059): run `SELECT 1` with a 2s timeout and record latencyMs.
-        builder.up();
+        long start = System.nanoTime();
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.setQueryTimeout((int) TIMEOUT.toSeconds());
+            try (ResultSet rs = stmt.executeQuery("SELECT 1")) {
+                rs.next();
+            }
+            long elapsedMs = (System.nanoTime() - start) / 1_000_000;
+            builder.up()
+                    .withDetail("query", "SELECT 1")
+                    .withDetail("elapsedMs", elapsedMs);
+        } catch (SQLException e) {
+            builder.down(e).withDetail("query", "SELECT 1");
+        }
     }
 }
