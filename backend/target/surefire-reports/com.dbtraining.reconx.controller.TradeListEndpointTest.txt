@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.dbtraining.reconx.controller.TradeListEndpointTest
--------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.683 s -- in com.dbtraining.reconx.controller.TradeListEndpointTest
