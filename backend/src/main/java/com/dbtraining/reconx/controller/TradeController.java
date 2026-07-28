@@ -9,18 +9,18 @@ import com.dbtraining.reconx.service.TradeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.Map;
@@ -51,58 +51,84 @@ public class TradeController {
     @GetMapping
     @Operation(summary = "List trades — paginated, filterable, sortable")
     public PagedResponse<TradeResponse> list(
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) LocalDate from,
+            @RequestParam(required = false) LocalDate to,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long counterpartyId,
-            @PageableDefault(size = 20, sort = "tradeDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<Trade> page = service.list(from, to, status, counterpartyId, pageable);
+            @PageableDefault(
+                    size = 20,
+                    sort = "tradeDate",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable) {
+
+        Page<Trade> page =
+                service.list(from, to, status, counterpartyId, pageable);
+
         return PagedResponse.from(page, mapper::toResponse);
     }
-@PostMapping
-@Operation(summary = "Create a trade")
-public ResponseEntity<TradeResponse> create(
-        @Valid @RequestBody TradeRequest req,
-        @AuthenticationPrincipal Object principal) {
 
-    String actor = principal != null ? principal.toString() : "system";
+    @PostMapping
+    @Operation(summary = "Create a trade")
+    public ResponseEntity<TradeResponse> create(
+            @Valid @RequestBody TradeRequest req,
+            @AuthenticationPrincipal String actor) {
 
-    Trade saved = service.create(req, actor);
-    TradeResponse response = mapper.toResponse(saved);
+        Trade saved = service.create(req, actor);
+        URI location = URI.create("/api/v1/trades/" + saved.getId());
 
-    URI location = URI.create("/api/v1/trades/" + saved.getId());
-
-    return ResponseEntity.created(location).body(response);
-}
+        return ResponseEntity.created(location)
+                .body(mapper.toResponse(saved));
+    }
 
     @PutMapping("/{id}")
-public ResponseEntity<TradeResponse> update(
-        @PathVariable Long id,
-        @Valid @RequestBody TradeRequest req,
-        @AuthenticationPrincipal Object principal) {
+    @Operation(summary = "Full update of a trade")
+    public TradeResponse update(
+            @PathVariable Long id,
+            @Valid @RequestBody TradeRequest req,
+            @AuthenticationPrincipal String actor) {
 
-    String actor = principal != null ? principal.toString() : "system";
-
-    Trade updated = service.update(id, req, actor);
-
-    return ResponseEntity.ok(mapper.toResponse(updated));
-}
+        return mapper.toResponse(service.update(id, req, actor));
+    }
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Update only the status field")
-    public TradeResponse updateStatus(@PathVariable Long id,
-                                      @RequestBody Map<String, String> body,
-                                      @AuthenticationPrincipal Object principal) {
-        // TODO(TICKET-ADV066): read body.get("status") and call
-        //   service.updateStatus(id, status, actor). Return mapper.toResponse(saved).
-        throw new UnsupportedOperationException("TICKET-ADV066");
+    public TradeResponse updateStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal String actor) {
+
+        return mapper.toResponse(
+                service.updateStatus(id, body.get("status"), actor)
+        );
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Soft delete (sets deleted_at)")
-    public ResponseEntity<Void> delete(@PathVariable Long id,
-                                       @AuthenticationPrincipal Object principal) {
-        // TODO(TICKET-ADV067): service.softDelete(id, actor); return 204 No Content.
-        throw new UnsupportedOperationException("TICKET-ADV067");
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @AuthenticationPrincipal String actor) {
+
+        service.softDelete(id, actor);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Deprecated(since = "v1.4.0", forRemoval = true)
+    @GetMapping(
+            value = "/old-search",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Void> oldSearch(HttpServletResponse response) {
+
+        response.setHeader("Deprecation", "true");
+        response.setHeader(
+                "Sunset",
+                "Sat, 1 Jul 2026 00:00:00 GMT"
+        );
+        response.setHeader(
+                "Link",
+                "</api/v1/trades?status=...>; rel=\"successor-version\""
+        );
+
+        return ResponseEntity.status(HttpStatus.GONE).build();
     }
 }
