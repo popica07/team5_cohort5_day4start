@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,29 +29,54 @@ public class ReconController {
 
     private final ReconBreakRepository breaks;
 
-    public ReconController(ReconBreakRepository breaks) { this.breaks = breaks; }
+    public ReconController(ReconBreakRepository breaks) {
+        this.breaks = breaks;
+    }
 
     @PostMapping("/run")
     @Operation(summary = "Trigger a reconciliation job (async)")
-    public ResponseEntity<Map<String, String>> runRecon(@Valid @RequestBody ReconRunRequest req) {
+    public ResponseEntity<Map<String, String>> runRecon(
+            @Valid @RequestBody ReconRunRequest req) {
+
         String jobId = UUID.randomUUID().toString();
+
         return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(Map.of("jobId", jobId, "status", "QUEUED"));
+                .body(Map.of(
+                        "jobId", jobId,
+                        "status", "QUEUED"
+                ));
     }
 
+    /**
+     * TICKET-ADV069
+     *
+     * The training reference implementation returns the currently available
+     * reconciliation breaks. ReconBreak does not currently contain a jobId
+     * field, so the path variable is accepted but is not used for filtering.
+     */
     @GetMapping("/jobs/{jobId}/results")
     @Operation(summary = "Get results for a recon job")
     public List<ReconBreak> results(@PathVariable String jobId) {
-        return Collections.emptyList();
+        return breaks.findAll();
     }
 
+    /**
+     * TICKET-ADV070
+     *
+     * Loads the reconciliation break, marks it as resolved and saves it.
+     */
     @PutMapping("/results/{id}/resolve")
     @Operation(summary = "Mark a recon break as RESOLVED with a note")
-    public ResponseEntity<ReconBreak> resolve(@PathVariable Long id,
-                                              @RequestBody Map<String, String> body) {
+    public ResponseEntity<ReconBreak> resolve(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+
         ReconBreak rb = breaks.findById(id)
-                .orElseThrow(() -> new TradeNotFoundException(id.toString()));
-        rb.resolve(body.get("note"));
+                .orElseThrow(() ->
+                        new TradeNotFoundException("recon_break " + id));
+
+        rb.resolve(body.getOrDefault("note", "manually resolved"));
+
         return ResponseEntity.ok(breaks.save(rb));
     }
 }
