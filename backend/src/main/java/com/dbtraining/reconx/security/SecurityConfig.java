@@ -3,6 +3,7 @@ package com.dbtraining.reconx.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -10,6 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -87,6 +89,13 @@ public class SecurityConfig {
                         .requestMatchers("/v1/recon/**").hasAnyRole("RECON_ANALYST", "ADMIN")
                         .requestMatchers("/v1/audit/**").hasAnyRole("RECON_ANALYST", "ADMIN")
                         .anyRequest().authenticated())
+                // Without an explicit entry point, a chain that declares no
+                // httpBasic/formLogin falls back to Http403ForbiddenEntryPoint,
+                // so unauthenticated callers get 403 where the API contract
+                // says 401 — clients then cannot tell "log in" from "not
+                // allowed". Covered by TICKET-ADV076.
+                .exceptionHandling(e -> e.authenticationEntryPoint(
+                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .headers(h -> h.frameOptions(f -> f.disable()))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
