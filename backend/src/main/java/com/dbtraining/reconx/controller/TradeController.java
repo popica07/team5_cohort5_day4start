@@ -18,7 +18,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.Map;
@@ -57,25 +59,34 @@ public class TradeController {
         Page<Trade> page = service.list(from, to, status, counterpartyId, pageable);
         return PagedResponse.from(page, mapper::toResponse);
     }
+@PostMapping
+@Operation(summary = "Create a trade")
+public ResponseEntity<TradeResponse> create(
+        @Valid @RequestBody TradeRequest req,
+        @AuthenticationPrincipal Object principal) {
 
-    @PostMapping
-    @Operation(summary = "Create a trade")
-    public ResponseEntity<TradeResponse> create(@Valid @RequestBody TradeRequest req,
-                                                @AuthenticationPrincipal Object principal) {
-        // TODO(TICKET-ADV064): call service.create(req, actor), build a Location
-        //   header at /api/v1/trades/{id}, and return 201 Created with the
-        //   mapped TradeResponse body.
-        throw new UnsupportedOperationException("TICKET-ADV064");
-    }
+    String actor = principal != null ? principal.toString() : "system";
+
+    Trade saved = service.create(req, actor);
+    TradeResponse response = mapper.toResponse(saved);
+
+    URI location = URI.create("/api/v1/trades/" + saved.getId());
+
+    return ResponseEntity.created(location).body(response);
+}
 
     @PutMapping("/{id}")
-    @Operation(summary = "Full update of a trade")
-    public TradeResponse update(@PathVariable Long id, @Valid @RequestBody TradeRequest req,
-                                @AuthenticationPrincipal Object principal) {
-        // TODO(TICKET-ADV065): delegate to service.update(id, req, actor) and
-        //   map the updated entity through mapper.toResponse.
-        throw new UnsupportedOperationException("TICKET-ADV065");
-    }
+public ResponseEntity<TradeResponse> update(
+        @PathVariable Long id,
+        @Valid @RequestBody TradeRequest req,
+        @AuthenticationPrincipal Object principal) {
+
+    String actor = principal != null ? principal.toString() : "system";
+
+    Trade updated = service.update(id, req, actor);
+
+    return ResponseEntity.ok(mapper.toResponse(updated));
+}
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Update only the status field")
