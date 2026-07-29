@@ -86,3 +86,67 @@ button { padding: var(--space-1) var(--space-2); border: 1px solid var(--color-b
   body { grid-template-columns: 1fr; grid-template-areas: "header" "main" "footer"; }
   .layout__sidebar { display: none; }
 }
+/* ============================================================================
+   TICKET-ADV106 — Advanced data table: sortable, resizable, frozen header
+   ============================================================================ */
+
+/* CRITICAL: the frozen header relies on `position: sticky` on `thead th`, which
+   fails SILENTLY if any ancestor sets `overflow: hidden`. `.table-scroll` is
+   the only scroll container in the chain, and it uses `overflow: auto`. */
+.table-scroll {
+  overflow: auto;
+  max-height: 60vh;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th,
+.data-table td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+/* Frozen header. The background must be opaque — the body scrolls underneath
+   it — so this uses --color-surface, which has a [data-theme="dark"] override.
+   (--color-bg-alt from the guide is undefined here and would render
+   transparent, letting rows show through the header.) */
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-surface);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Sort indicator driven purely by aria-sort, so the visual state and the state
+   exposed to assistive tech can never drift apart. */
+.data-table thead th[aria-sort="ascending"]::after  { content: " ▲"; }
+.data-table thead th[aria-sort="descending"]::after { content: " ▼"; }
+
+.resize-handle {
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  cursor: col-resize;
+  background: var(--color-border);
+  margin-left: var(--space-2);
+  vertical-align: middle;
+}
+.resize-handle:hover { background: var(--color-gold); }
+
+/* Applied to <body> during a drag so text isn't selected while resizing and
+   the col-resize cursor persists even outside the handle. */
+body.is-resizing { user-select: none; cursor: col-resize; }
+
+.table-status { margin: var(--space-2) 0; opacity: 0.7; font-size: 13px; }
+.table-status--error { color: var(--color-danger); opacity: 1; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
