@@ -1,54 +1,436 @@
-/* ============================================================================
-   TICKET-ADV101 / ADV102 — CSS custom properties + dark theme via data-theme
-   TICKET-ADV104 — animations (fade-in, slide-in, pulse)
-   TICKET-ADV105 — responsive breakpoints (desktop -> tablet -> mobile)
-   TICKET-ADV110 — BEM naming: block__element--modifier
-   ============================================================================ */
+/* ==========================================================================
+   TICKET-ADV098 — Nested Flexbox page shell
+   TICKET-ADV099 — CSS custom properties / design tokens
+   ========================================================================== */
+
 :root {
+  /* Brand colours */
   --color-primary: #003366;
-  --color-gold:    #C8A951;
-  --color-slate:   #2E5FA3;
+  --color-primary-2: #2e5fa3;
+  --color-gold: #c8a951;
+
+  /* Status colours */
   --color-success: #28a745;
   --color-warning: #ffc107;
-  --color-danger:  #dc3545;
-  --color-bg:      #ffffff;
-  --color-text:    #1a1a1a;
-  --color-surface: #f5f5f5;
-  --color-border:  #d4d4d4;
-  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
-  --radius:  4px;
-}
-[data-theme="dark"] {
-  --color-bg:      #1a1a1a;
-  --color-text:    #f5f5f5;
-  --color-surface: #2a2a2a;
-  --color-border:  #3a3a3a;
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
+  --color-danger: #dc3545;
+
+  /* Surface colours */
+  --color-bg: #ffffff;
+  --color-bg-alt: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-border: #d4d4d4;
+  --color-text: #1a1a1a;
+  --color-text-muted: #666666;
+  --color-on-primary: #ffffff;
+
+  /* 4px spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Dimensions */
+  --header-height: 64px;
+  --footer-height: 48px;
+  --sidebar-width: 240px;
+  --feed-max-height: 50vh;
+  --table-max-height: 60vh;
+  --resize-handle-width: 4px;
+  --resize-handle-height: 16px;
+
+  /* Borders and shadows */
+  --border-width: 1px;
+  --border-width-accent: 4px;
+  --focus-width: 2px;
+  --radius: 4px;
+  --radius-lg: 8px;
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 12%);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 16%);
+
+  /* Typography */
+  --font-size-sm: 13px;
+  --font-size-md: 16px;
+  --font-size-lg: 22px;
+  --font-size-title: 18px;
+
+  /* Animation */
+  --animation-duration: 0.3s;
+  --slide-distance: -10%;
 }
 
-* { box-sizing: border-box; }
+[data-theme="dark"] {
+  --color-bg: #1a1a1a;
+  --color-bg-alt: #242424;
+  --color-surface: #2a2a2a;
+  --color-border: #3a3a3a;
+  --color-text: #f5f5f5;
+  --color-text-muted: #b8b8b8;
+}
+
+html,
 body {
+  height: 100%;
   margin: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  /* TICKET-ADV098 — page shell grid */
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  grid-template-rows: 64px 1fr 40px;
-  grid-template-areas:
-    "header  header"
-    "sidebar main"
-    "footer  footer";
+  font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+}
+
+/* ==========================================================================
+   ADV098 — Application shell
+   ========================================================================== */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
-/* TICKET-ADV105 — tablet -> sidebar collapses */
-@media (max-width: 1024px) {
-  body { grid-template-columns: 180px 1fr; }
+/* Fixed-height header */
+.app-header {
+  flex: 0 0 var(--header-height);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-4);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-sm);
 }
+
+.app-header__title {
+  margin: 0;
+  font-size: var(--font-size-title);
+}
+
+.app-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
+.app-header__nav a {
+  padding: var(--space-2) 0;
+  color: var(--color-on-primary);
+  text-decoration: none;
+}
+
+.app-header__nav a:hover {
+  text-decoration: underline;
+}
+
+.app-header__nav a[aria-current="page"] {
+  border-bottom:
+          var(--focus-width)
+          solid
+          var(--color-gold);
+}
+
+.app-header__theme-toggle {
+  color: var(--color-on-primary);
+}
+
+/* Middle section fills all remaining viewport space */
+.app-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Fixed sidebar: does not grow or shrink */
+.app-sidebar {
+  flex: 0 0 var(--sidebar-width);
+  padding: var(--space-4);
+  overflow-y: auto;
+  background: var(--color-bg-alt);
+  border-right:
+          var(--border-width)
+          solid
+          var(--color-border);
+}
+
+.app-sidebar__title {
+  margin-top: 0;
+  font-size: var(--font-size-md);
+}
+
+.app-sidebar__list {
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.app-sidebar__list li {
+  margin-bottom: var(--space-2);
+}
+
+.app-sidebar__list a {
+  color: var(--color-primary-2);
+}
+
+/* Main area consumes remaining horizontal space */
+.app-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--space-4);
+  overflow-y: auto;
+}
+
+/* Fixed-height footer */
+.app-footer {
+  flex: 0 0 var(--footer-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-4);
+  border-top:
+          var(--border-width)
+          solid
+          var(--color-border);
+  background: var(--color-bg-alt);
+  color: var(--color-text-muted);
+}
+
+/* ==========================================================================
+   ADV098 — Three-card Flexbox dashboard row
+   ========================================================================== */
+
+.dashboard-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.dashboard-grid > .stat-card {
+  flex:
+          1
+          1
+          calc((100% - (var(--space-4) * 2)) / 3);
+  min-width: var(--sidebar-width);
+}
+
+.stat-card {
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border:
+          var(--border-width)
+          solid
+          var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-card--warning {
+  border-color: var(--color-warning);
+}
+
+.stat-card__title {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.stat-card__value {
+  margin: var(--space-2) 0 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   Live trade feed
+   ========================================================================== */
+
+.feed-section {
+  margin-top: var(--space-6);
+}
+
+.trade-feed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: var(--feed-max-height);
+  margin-top: var(--space-3);
+  overflow-y: auto;
+}
+
+.trade-card {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border:
+          var(--border-width)
+          solid
+          var(--color-border);
+  border-radius: var(--radius);
+  animation:
+          slide-in
+          var(--animation-duration)
+          ease-out;
+}
+
+.trade-card--matched {
+  border-left:
+          var(--border-width-accent)
+          solid
+          var(--color-success);
+}
+
+.trade-card--break {
+  border-left:
+          var(--border-width-accent)
+          solid
+          var(--color-danger);
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(var(--slide-distance));
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   Buttons and accessibility
+   ========================================================================== */
+
+button {
+  padding: var(--space-1) var(--space-2);
+  color: inherit;
+  background: transparent;
+  border:
+          var(--border-width)
+          solid
+          var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+button:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+:focus-visible {
+  outline:
+          var(--focus-width)
+          solid
+          var(--color-gold);
+  outline-offset: var(--focus-width);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: var(--border-width);
+  height: var(--border-width);
+  padding: 0;
+  margin: calc(var(--border-width) * -1);
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip-path: inset(50%);
+}
+
+/* ==========================================================================
+   Advanced data table
+   ========================================================================== */
+
+.table-scroll {
+  max-height: var(--table-max-height);
+  overflow: auto;
+  border:
+          var(--border-width)
+          solid
+          var(--color-border);
+  border-radius: var(--radius);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.data-table th,
+.data-table td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom:
+          var(--border-width)
+          solid
+          var(--color-border);
+}
+
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-surface);
+  cursor: pointer;
+  user-select: none;
+}
+
+.data-table thead th[aria-sort="ascending"]::after {
+  content: " ▲";
+}
+
+.data-table thead th[aria-sort="descending"]::after {
+  content: " ▼";
+}
+
+.resize-handle {
+  display: inline-block;
+  width: var(--resize-handle-width);
+  height: var(--resize-handle-height);
+  margin-left: var(--space-2);
+  vertical-align: middle;
+  background: var(--color-border);
+  cursor: col-resize;
+}
+
+.resize-handle:hover {
+  background: var(--color-gold);
+}
+
+body.is-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.table-status {
+  margin: var(--space-2) 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.table-status--error {
+  color: var(--color-danger);
+}
+
+/* ==========================================================================
+   Responsive behaviour
+   ========================================================================== */
+
 @media (max-width: 720px) {
   body { grid-template-columns: 1fr; grid-template-areas: "header" "main" "footer"; }
   .layout__sidebar { display: none; }
@@ -83,3 +465,35 @@ body {
 
 button { padding: var(--space-1) var(--space-2); border: 1px solid var(--color-border); background: transparent; color: inherit; border-radius: var(--radius); cursor: pointer; }
 :focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
+  .app-header {
+    flex-wrap: wrap;
+    height: auto;
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-2);
+  }
+
+  .app-header__nav {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  /*
+   * ADV098 requires the sidebar to remain fixed-width and not shrink.
+   * The body therefore scrolls horizontally on very narrow screens rather
+   * than shrinking the sidebar below 240px.
+   */
+  .app-body {
+    overflow-x: auto;
+  }
+}
+
+/* Respect operating-system reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
