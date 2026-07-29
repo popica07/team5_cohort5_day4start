@@ -13,6 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 /**
  * ============================================================================
@@ -72,6 +77,7 @@ public class SecurityConfig {
                                            JwtAuthenticationFilter jwtFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(c -> c.configurationSource(corsConfigurationSource()))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -81,6 +87,9 @@ public class SecurityConfig {
                                 "/swagger-ui.html", "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/h2/**").permitAll()
+                        // EventSource can't set an Authorization header, so the SSE
+                        // stream is intentionally unauthenticated (TICKET-ADV104).
+                        .requestMatchers(HttpMethod.GET,    "/v1/trades/stream").permitAll()
                         .requestMatchers(HttpMethod.GET,    "/v1/trades/**").hasAnyRole("VIEWER", "TRADER", "RECON_ANALYST", "ADMIN")
                         .requestMatchers(HttpMethod.POST,   "/v1/trades").hasAnyRole("TRADER", "ADMIN")
                         .requestMatchers(HttpMethod.PUT,    "/v1/trades/**").hasAnyRole("TRADER", "ADMIN")
@@ -104,5 +113,25 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Dev-only CORS: the static dashboard is served by `py -m http.server 5500`
+     * while this API lives on :8081, so the browser treats every call as
+     * cross-origin. Scoped to the local static-server origins on purpose —
+     * widen this deliberately, never to "*", and note that allowCredentials
+     * stays off (EventSource here sends no cookies).
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration cfg = new CorsConfiguration();
+        cfg.setAllowedOrigins(List.of("http://localhost:5500", "http://127.0.0.1:5500"));
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setAllowCredentials(false);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", cfg);
+        return source;
     }
 }
