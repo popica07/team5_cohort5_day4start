@@ -69,6 +69,11 @@ body {
 .stat-card h3    { margin: 0; font-size: 13px; opacity: 0.7; }
 .stat-card p     { margin: var(--space-2) 0 0; font-size: 22px; font-weight: 700; }
 
+/* TICKET-ADV104 — SSE connection badge */
+.feed-header { display: flex; align-items: center; gap: var(--space-3); }
+.feed-header h2 { margin: 0; }
+.sse-status { font-size: 12px; padding: var(--space-1) var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius); background: var(--color-surface); opacity: 0.85; }
+
 /* TICKET-ADV103 / ADV104 — live feed slide-in */
 #trade-feed { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-3); max-height: 50vh; overflow-y: auto; }
 .trade-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: var(--space-2) var(--space-3); animation: slide-in 0.3s ease-out; }

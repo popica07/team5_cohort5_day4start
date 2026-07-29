@@ -42,17 +42,20 @@ public class TradeService {
     private final InstrumentRepository instRepo;
     private final TradeEventProducer events;
     private final TradeMetrics metrics;
+    private final TradeStreamService stream;
 
     public TradeService(TradeRepository tradeRepo,
                         CounterpartyRepository cpRepo,
                         InstrumentRepository instRepo,
                         TradeEventProducer events,
-                        TradeMetrics metrics) {
+                        TradeMetrics metrics,
+                        TradeStreamService stream) {
         this.tradeRepo = tradeRepo;
         this.cpRepo = cpRepo;
         this.instRepo = instRepo;
         this.events = events;
         this.metrics = metrics;
+        this.stream = stream;
     }
 
     public Trade create(TradeRequest req, String actor) {
@@ -91,6 +94,8 @@ public class TradeService {
     // Leave this commented until ADV129 is implemented.
     // events.publish(...);
 
+    stream.broadcast(saved);
+
     return saved;
 }
 
@@ -128,7 +133,9 @@ public Trade update(Long id, TradeRequest req, String actor) {
     trade.setPrice(req.price());
     trade.setTradeDate(req.tradeDate());
 
-    return tradeRepo.save(trade);
+    Trade saved = tradeRepo.save(trade);
+    stream.broadcast(saved);
+    return saved;
 }
 
     public Trade updateStatus(Long id, String status, String actor) {
@@ -139,6 +146,7 @@ public Trade update(Long id, TradeRequest req, String actor) {
         t.setStatus(status);
         String before = "status=" + t.getStatus();
         Trade saved = tradeRepo.save(t);
+        stream.broadcast(saved);
         events.publish(new TradeEvent(UUID.randomUUID(), t.getTradeRef(),
                 TradeEvent.EventType.TRADE_UPDATED, Instant.now(), actor, before, saved.getStatus()));
         return t;
@@ -148,7 +156,8 @@ public Trade update(Long id, TradeRequest req, String actor) {
         Trade t = tradeRepo.findById(id)
                 .orElseThrow(() -> new TradeNotFoundException("id=" + id));
         t.softDelete();
-        tradeRepo.save(t);
+        Trade saved = tradeRepo.save(t);
+        stream.broadcast(saved);
         events.publish(new TradeEvent(UUID.randomUUID(), t.getTradeRef(),
                 TradeEvent.EventType.TRADE_CANCELLED, Instant.now(), actor, null, null));
     }

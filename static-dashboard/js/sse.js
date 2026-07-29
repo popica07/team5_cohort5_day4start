@@ -7,7 +7,14 @@
   const STATUS_EL = document.getElementById('sse-status');
   if (!FEED_EL) return; // guard: script may load on pages without the feed
 
-  const STREAM_URL = '/api/v1/trades/stream';
+  // The backend runs on :8081 while these files are usually served by
+  // `py -m http.server 5500`, so a relative path would 404 against the static
+  // server. Set window.RECONX_API_ORIGIN = '' when the backend serves this
+  // page itself (same origin).
+  const API_ORIGIN = window.RECONX_API_ORIGIN !== undefined
+    ? window.RECONX_API_ORIGIN
+    : 'http://localhost:8081';
+  const STREAM_URL = API_ORIGIN + '/api/v1/trades/stream';
   let sse = null;
 
   // ── Helpers ────────────────────────────────────────────────────────────────

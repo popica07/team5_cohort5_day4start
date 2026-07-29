@@ -45,7 +45,11 @@ TICKET-ADV100 — ARIA roles + aria-live for the trade feed
     </section>
 
     <section aria-labelledby="feed">
-      <h2 id="feed">Live trade feed</h2>
+      <div class="feed-header">
+        <h2 id="feed">Live trade feed</h2>
+        <!-- TICKET-ADV104 — EventSource connection state, driven by js/sse.js -->
+        <span id="sse-status" class="sse-status" role="status">Connecting…</span>
+      </div>
       <!-- TICKET-ADV100 aria-live so screen readers announce new trades -->
       <div id="trade-feed" role="status" aria-live="polite" aria-atomic="false"></div>
     </section>
