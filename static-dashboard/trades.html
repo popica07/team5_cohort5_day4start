@@ -1,0 +1,83 @@
+<!doctype html>
+<!--
+============================================================================
+TICKET-ADV106 — Advanced data table (sortable, resizable, frozen header)
+
+Reuses the ADV098 page shell so the table sits inside the same
+header/sidebar/main/footer layout as dashboard.html.
+
+Each sortable <th> carries:
+  data-col   — the property name on the row object to sort by
+  data-dir   — initial direction
+  data-type  — "number" switches the comparator from localeCompare to
+               numeric subtraction
+and an inner <span class="resize-handle"> that starts a drag-resize.
+
+The header is frozen via `position: sticky` on `thead th` in style.css.
+Sticky fails silently if ANY ancestor sets `overflow: hidden`, so the only
+scroll container in the chain is `.table-scroll` at `overflow: auto`.
+============================================================================
+-->
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <title>ReconX (static) — Trades</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="layout__header" role="banner">
+    <h1 class="layout__title">ReconX</h1>
+    <nav class="layout__nav" aria-label="Main navigation">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="trades.html" aria-current="page">Trades</a>
+      <a href="recon.html">Recon</a>
+    </nav>
+    <button id="theme-toggle" aria-label="Toggle light/dark theme">🌗</button>
+  </header>
+
+  <aside class="layout__sidebar" role="complementary">
+    <h2>Quick filters</h2>
+    <ul>
+      <li><a href="#">All trades</a></li>
+      <li><a href="#">Open breaks</a></li>
+      <li><a href="#">Today</a></li>
+    </ul>
+  </aside>
+
+  <main class="layout__main" role="main">
+    <section aria-labelledby="trades-heading">
+      <h2 id="trades-heading">All trades</h2>
+
+      <p id="trades-status" class="table-status" role="status" aria-live="polite">
+        Loading trades…
+      </p>
+
+      <div class="table-scroll">
+        <table class="data-table" id="trades-table">
+          <caption class="visually-hidden">
+            Trades. Activate a column header to sort by that column; activate again to reverse.
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" data-col="tradeRef" data-dir="asc" tabindex="0">Trade Ref <span class="resize-handle" aria-hidden="true"></span></th>
+              <th scope="col" data-col="symbol"   data-dir="asc" tabindex="0">Instrument <span class="resize-handle" aria-hidden="true"></span></th>
+              <th scope="col" data-col="quantity" data-dir="asc" data-type="number" tabindex="0">Quantity <span class="resize-handle" aria-hidden="true"></span></th>
+              <th scope="col" data-col="price"    data-dir="asc" data-type="number" tabindex="0">Price <span class="resize-handle" aria-hidden="true"></span></th>
+              <th scope="col" data-col="status"   data-dir="asc" tabindex="0">Status <span class="resize-handle" aria-hidden="true"></span></th>
+            </tr>
+          </thead>
+          <tbody id="trades-tbody"><!-- rows injected by js/trades.js --></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="layout__footer" role="contentinfo">
+    <small>ReconX TDI 2026 · static dashboard (Day 7)</small>
+  </footer>
+
+  <script src="js/theme.js"></script>
+  <script src="js/trades.js"></script>
+</body>
+</html>
