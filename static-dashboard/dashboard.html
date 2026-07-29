@@ -1,9 +1,8 @@
 <!doctype html>
 <!--
 ============================================================================
-TICKET-ADV098 — CSS Grid page shell (sidebar + header + main + footer)
-TICKET-ADV099 — Semantic HTML5 (header/nav/main/section/article/aside/footer)
-TICKET-ADV100 — ARIA roles + aria-live for the trade feed
+TICKET-ADV098 — Flexbox page shell
+TICKET-ADV099 — CSS custom properties / design tokens
 ============================================================================
 -->
 <html lang="en" data-theme="light">
@@ -13,52 +12,81 @@ TICKET-ADV100 — ARIA roles + aria-live for the trade feed
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
-<body>
-  <header class="layout__header" role="banner">
-    <h1 class="layout__title">ReconX</h1>
-    <nav class="layout__nav" aria-label="Main navigation">
-      <a href="dashboard.html" aria-current="page">Dashboard</a>
-      <a href="trades.html">Trades</a>
-      <a href="recon.html">Recon</a>
-    </nav>
-    <button id="theme-toggle" aria-label="Toggle light/dark theme">🌗</button>
-  </header>
 
-  <aside class="layout__sidebar" role="complementary">
-    <h2>Quick filters</h2>
-    <ul>
-      <li><a href="#">All trades</a></li>
-      <li><a href="#">Open breaks</a></li>
-      <li><a href="#">Today</a></li>
-    </ul>
+<body class="app-shell">
+<header class="app-header" role="banner">
+  <h1 class="app-header__title">ReconX</h1>
+
+  <nav class="app-header__nav" aria-label="Main navigation">
+    <a href="dashboard.html" aria-current="page">Dashboard</a>
+    <a href="trades.html">Trades</a>
+    <a href="recon.html">Recon</a>
+  </nav>
+
+  <button
+          id="theme-toggle"
+          class="app-header__theme-toggle"
+          type="button"
+          aria-label="Toggle light and dark theme"
+  >
+    🌗
+  </button>
+</header>
+
+<div class="app-body">
+  <aside class="app-sidebar" role="complementary">
+    <h2 class="app-sidebar__title">Quick filters</h2>
+
+    <nav aria-label="Trade filters">
+      <ul class="app-sidebar__list">
+        <li><a href="#">All trades</a></li>
+        <li><a href="#">Open breaks</a></li>
+        <li><a href="#">Today</a></li>
+      </ul>
+    </nav>
   </aside>
 
-  <main class="layout__main" role="main">
-    <section aria-labelledby="kpi">
-      <h2 id="kpi">Today at a glance</h2>
-      <div class="stat-grid">
-        <article class="stat-card"><h3>Trades</h3><p>120</p></article>
-        <article class="stat-card"><h3>Matched</h3><p>105</p></article>
-        <article class="stat-card stat-card--warn"><h3>Open breaks</h3><p>15</p></article>
-        <article class="stat-card"><h3>Notional</h3><p>$24.3M</p></article>
+  <main class="app-main" role="main">
+    <section aria-labelledby="kpi-heading">
+      <h2 id="kpi-heading">Today at a glance</h2>
+
+      <div class="dashboard-grid">
+        <article class="stat-card">
+          <h3 class="stat-card__title">Trades</h3>
+          <p class="stat-card__value">120</p>
+        </article>
+
+        <article class="stat-card">
+          <h3 class="stat-card__title">Matched</h3>
+          <p class="stat-card__value">105</p>
+        </article>
+
+        <article class="stat-card stat-card--warning">
+          <h3 class="stat-card__title">Open breaks</h3>
+          <p class="stat-card__value">15</p>
+        </article>
       </div>
     </section>
 
-    <section aria-labelledby="feed">
-      <h2 id="feed">Live trade feed</h2>
-      <!-- TICKET-ADV100 aria-live so screen readers announce new trades -->
-      <div id="trade-feed" role="status" aria-live="polite" aria-atomic="false"></div>
-    </section>
-    <section id="trade--feed" class="trade-feed">
+    <section class="feed-section" aria-labelledby="feed-heading">
+      <h2 id="feed-heading">Live trade feed</h2>
 
+      <div
+              id="trade-feed"
+              class="trade-feed"
+              role="status"
+              aria-live="polite"
+              aria-atomic="false"
+      ></div>
     </section>
   </main>
+</div>
 
-  <footer class="layout__footer" role="contentinfo">
-    <small>ReconX TDI 2026 · static dashboard (Day 7)</small>
-  </footer>
+<footer class="app-footer" role="contentinfo">
+  <small>ReconX TDI 2026 · static dashboard (Day 7)</small>
+</footer>
 
-  <script src="js/theme.js"></script>
-  <script src="js/sse.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/sse.js"></script>
 </body>
 </html>
