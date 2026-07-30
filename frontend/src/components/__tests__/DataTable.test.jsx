@@ -2,7 +2,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
-import DataTable from '../DataTable.jsx';
+import DataTable from '@components/DataTable.jsx';
 
 describe('<DataTable>', () => {
   it('renders columns and rows', () => {
