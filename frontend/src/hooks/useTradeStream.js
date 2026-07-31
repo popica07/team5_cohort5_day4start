@@ -22,3 +22,4 @@ export function useTradeStream(url = '/api/v1/trades/stream') {
 
   return { trades, isConnected };
 }
+

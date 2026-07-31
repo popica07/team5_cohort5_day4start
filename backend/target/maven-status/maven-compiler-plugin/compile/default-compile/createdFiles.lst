@@ -47,6 +47,7 @@ com\dbtraining\reconx\service\TradeAnalyticsService.class
 com\dbtraining\reconx\dto\TradeMapper.class
 com\dbtraining\reconx\model\DerivativeTrade$OptionType.class
 com\dbtraining\reconx\dto\PagedResponse.class
+com\dbtraining\reconx\service\TradeStreamService$TradeStreamEvent.class
 com\dbtraining\reconx\model\ReconciliationRule.class
 com\dbtraining\reconx\dto\TradeMapperImpl.class
 com\dbtraining\reconx\dto\LoginResponse.class
@@ -67,6 +68,8 @@ com\dbtraining\reconx\repository\AppUserRepository.class
 com\dbtraining\reconx\repository\entity\ReconBreak.class
 com\dbtraining\reconx\dto\TradeRequest.class
 com\dbtraining\reconx\repository\CounterpartyRepository.class
+com\dbtraining\reconx\service\TradeStreamService.class
 com\dbtraining\reconx\service\ReconciliationEngine.class
 com\dbtraining\reconx\repository\entity\Counterparty.class
+com\dbtraining\reconx\service\TradeStreamService$1.class
 com\dbtraining\reconx\service\TradeService.class
