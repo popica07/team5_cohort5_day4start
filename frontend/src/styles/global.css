@@ -78,3 +78,75 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* TICKET-ADV109 — keyboard focus visibility */
 :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+.page-skeleton {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.page-skeleton__title,
+.page-skeleton__card,
+.page-skeleton__row {
+  background: linear-gradient(
+    90deg,
+    #e5e7eb 25%,
+    #f3f4f6 50%,
+    #e5e7eb 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.4s infinite;
+  border-radius: 0.5rem;
+}
+
+.page-skeleton__title {
+  width: 40%;
+  height: 2rem;
+}
+
+.page-skeleton__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.page-skeleton__card {
+  height: 7rem;
+}
+
+.page-skeleton__table {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.page-skeleton__row {
+  height: 3rem;
+}
+
+@keyframes skeleton-loading {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-skeleton__cards {
+    grid-template-columns: 1fr;
+  }
+
+  .page-skeleton__title {
+    width: 70%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-skeleton__title,
+  .page-skeleton__card,
+  .page-skeleton__row {
+    animation: none;
+  }
+}
