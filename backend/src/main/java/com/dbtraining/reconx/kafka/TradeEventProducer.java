@@ -10,32 +10,25 @@ import org.springframework.stereotype.Component;
  * ============================================================================
  * TICKET-ADV129 — TradeEventProducer
  *
- * WHAT:    Publishes TradeEvent messages to the `trade-events` Kafka topic.
- * HOW:     KafkaTemplate<String, TradeEvent>. Key = tradeRef so that all
- *          events for the same trade hash to the same partition and
- *          preserve ordering.
- * WHY:     Out-of-order events for the same trade would make event sourcing
- *          impossible (you'd "apply" CREATE after UPDATE).
- * OBSERVE: Kafdrop -> `trade-events` shows one message per published event,
- *          partitioned by tradeRef.
- * ============================================================================
+ * WHAT:    Publishes TradeEvent messages to the trade-events Kafka topic.
  *
- *  TODO(TICKET-ADV129):
- *    public void publish(TradeEvent event) {
- *        log.debug("Publishing TradeEvent eventId={} ref={} type={}",
- *                  event.eventId(), event.tradeRef(), event.eventType());
- *        template.send(TOPIC, event.tradeRef(), event);
- *    }
+ * HOW:     Uses tradeRef as the Kafka message key. Kafka therefore sends all
+ *          events with the same tradeRef to the same partition, preserving
+ *          their order.
  *
- *  GOTCHA: NEVER let a Kafka publish failure roll back the DB transaction.
- *          Publish AFTER commit (use TransactionSynchronizationManager or
- *          @TransactionalEventListener), or accept eventual consistency.
+ * WHY:     Consumers must process events such as TRADE_CREATED before
+ *          TRADE_UPDATED for the same trade.
+ *
+ * OBSERVE: Kafdrop -> trade-events -> Messages. The record key should equal
+ *          the event's tradeRef.
  * ============================================================================
  */
 @Component
 public class TradeEventProducer {
 
-    private static final Logger log = LoggerFactory.getLogger(TradeEventProducer.class);
+    private static final Logger log =
+            LoggerFactory.getLogger(TradeEventProducer.class);
+
     private static final String TOPIC = "trade-events";
 
     private final KafkaTemplate<String, TradeEvent> template;
@@ -44,7 +37,37 @@ public class TradeEventProducer {
         this.template = template;
     }
 
+    /**
+     * Publishes a TradeEvent asynchronously to Kafka.
+     *
+     * @param event the TradeEvent to publish
+     */
     public void publish(TradeEvent event) {
-        throw new UnsupportedOperationException("TICKET-ADV129");
+        log.debug(
+                "Publishing TradeEvent eventId={} ref={} type={}",
+                event.eventId(),
+                event.tradeRef(),
+                event.eventType()
+        );
+
+        template.send(TOPIC, event.tradeRef(), event)
+                .whenComplete((result, exception) -> {
+                    if (exception != null) {
+                        log.error(
+                                "Failed to publish TradeEvent eventId={} tradeRef={}",
+                                event.eventId(),
+                                event.tradeRef(),
+                                exception
+                        );
+                    } else {
+                        log.info(
+                                "Published TradeEvent eventId={} tradeRef={} partition={} offset={}",
+                                event.eventId(),
+                                event.tradeRef(),
+                                result.getRecordMetadata().partition(),
+                                result.getRecordMetadata().offset()
+                        );
+                    }
+                });
     }
 }
