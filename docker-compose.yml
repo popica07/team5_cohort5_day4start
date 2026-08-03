@@ -67,7 +67,7 @@ services:
       kafka:    {condition: service_healthy}
     ports: ["8080:8080"]
     environment:
-      SPRING_PROFILES_ACTIVE: uat
+      SPRING_PROFILES_ACTIVE: uat,docker
       # application.yml sets server.port=8081 for local dev, but the whole
       # compose stack addresses the backend on 8080 — the port mapping above,
       # the healthcheck below, nginx's proxy_pass and Prometheus's scrape
