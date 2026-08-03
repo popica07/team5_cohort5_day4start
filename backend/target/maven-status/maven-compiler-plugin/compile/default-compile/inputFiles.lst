@@ -1,62 +1,63 @@
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\config\OpenApiConfig.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\controller\AuditController.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\controller\AuthController.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\controller\ReconController.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\controller\TradeController.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\LoginRequest.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\LoginResponse.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\PagedResponse.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\ReconResult.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\ReconRunRequest.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\TradeEvent.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\TradeMapper.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\TradeRequest.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\TradeResponse.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\DuplicateTradeRefException.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\GlobalExceptionHandler.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\InvalidTradeException.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\ReconciliationMismatchException.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\ReconException.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\TradeNotFoundException.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\AlertConsumer.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\AuditEventConsumer.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\KafkaErrorHandlerConfig.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\KafkaTopicsConfig.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\ReconciliationConsumer.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\TradeEventProducer.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\BondTrade.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\DerivativeTrade.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\EquityTrade.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\FXTrade.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\Money.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\ReconciliationRule.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\Side.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\TradeFactory.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\TradeRef.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\TradeType.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\observability\DatabaseHealthIndicator.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\observability\KafkaHealthIndicator.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\observability\MdcFilter.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\observability\TradeMetrics.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\ReconxApplication.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\AppUserRepository.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\AuditLogRepository.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\CounterpartyRepository.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\AppUser.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\AuditLogEntry.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\Counterparty.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\Instrument.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\ReconBreak.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\Trade.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\InstrumentRepository.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\ReconBreakRepository.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\TradeRepository.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\TradeSpecifications.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\security\JwtAuthenticationFilter.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\security\JwtTokenProvider.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\security\SecurityConfig.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\service\InstrumentService.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\service\ReconciliationEngine.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\service\TradeAnalyticsService.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\service\TradeService.java
-D:\Deutche Bank\proiect deutche\team repo\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\service\TradeStreamService.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\config\OpenApiConfig.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\controller\AuditController.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\controller\AuthController.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\controller\ReconController.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\controller\TradeController.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\LoginRequest.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\LoginResponse.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\PagedResponse.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\ReconResult.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\ReconRunRequest.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\TradeEvent.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\TradeMapper.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\TradeRequest.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\dto\TradeResponse.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\DuplicateTradeRefException.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\GlobalExceptionHandler.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\InvalidTradeException.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\ReconciliationMismatchException.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\ReconException.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\exception\TradeNotFoundException.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\AlertConsumer.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\AuditEventConsumer.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\DlqConsumer.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\KafkaErrorHandlerConfig.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\KafkaTopicsConfig.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\ReconciliationConsumer.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\kafka\TradeEventProducer.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\BondTrade.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\DerivativeTrade.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\EquityTrade.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\FXTrade.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\Money.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\ReconciliationRule.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\Side.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\TradeFactory.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\TradeRef.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\model\TradeType.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\observability\DatabaseHealthIndicator.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\observability\KafkaHealthIndicator.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\observability\MdcFilter.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\observability\TradeMetrics.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\ReconxApplication.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\AppUserRepository.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\AuditLogRepository.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\CounterpartyRepository.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\AppUser.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\AuditLogEntry.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\Counterparty.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\Instrument.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\ReconBreak.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\entity\Trade.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\InstrumentRepository.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\ReconBreakRepository.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\TradeRepository.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\repository\TradeSpecifications.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\security\JwtAuthenticationFilter.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\security\JwtTokenProvider.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\security\SecurityConfig.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\service\InstrumentService.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\service\ReconciliationEngine.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\service\TradeAnalyticsService.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\service\TradeService.java
+C:\Users\Admin\IdeaProjects\team5_cohort5_day4start\backend\src\main\java\com\dbtraining\reconx\service\TradeStreamService.java
