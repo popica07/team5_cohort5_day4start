@@ -110,7 +110,7 @@ services:
   kafdrop:
     image: obsidiandynamics/kafdrop:4.0.1
     container_name: reconx-kafdrop
-    profiles: ["debug"]
+    # optional: run with `--profile debug` or bring up manually; removed explicit 'profiles' key
     depends_on: [kafka]
     environment:
       KAFKA_BROKERCONNECT: kafka:29092
