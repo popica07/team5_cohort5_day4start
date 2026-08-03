@@ -1,7 +1,7 @@
 # =============================================================================
-# TICKET-ADV148 — 7-service stack: backend, frontend, postgres, kafka, zookeeper,
+# 7-service stack: backend, frontend, postgres, kafka, zookeeper,
 #                prometheus, grafana (+ optional kafdrop behind "debug" profile)
-# TICKET-ADV152 — Health checks gate dependent services
+# Health checks gate dependent services
 # =============================================================================
 services:
 
@@ -52,11 +52,12 @@ services:
 
   backend:
     build: ./backend
+    image: ghcr.io/sidoncode/reconx-backend:latest
     container_name: reconx-backend
     depends_on:
       postgres: {condition: service_healthy}
       kafka:    {condition: service_healthy}
-    ports: ["8081:8081"]
+    ports: ["8080:8080"]
     environment:
       SPRING_PROFILES_ACTIVE: uat
       POSTGRES_HOST: postgres
@@ -67,7 +68,7 @@ services:
       KAFKA_BOOTSTRAP: kafka:29092
       JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me-32-bytes-min!!}
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081/api/actuator/health"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -75,6 +76,7 @@ services:
 
   frontend:
     build: ./frontend
+    image: ghcr.io/sidoncode/reconx-frontend:latest
     container_name: reconx-frontend
     depends_on:
       backend: {condition: service_healthy}
