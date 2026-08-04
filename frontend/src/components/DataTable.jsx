@@ -51,7 +51,9 @@ export default function DataTable({
     setSortKey(key);
     setSortDirection(nextDirection);
     setPage(0);
-    onSortChange?.(key);
+    // Direction is passed too — a server-paginated consumer can't derive it,
+    // since the toggle state lives in here.
+    onSortChange?.(key, nextDirection);
   };
 
   const sortedData = useMemo(() => {

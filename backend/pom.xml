@@ -273,23 +273,17 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-
-            <!--
-             ============================================================================
-             TICKET-ADV046 — JaCoCo coverage reporting
-             TICKET-ADV156 — JaCoCo coverage gate: >=85% line and >=70% branch
-
-             prepare-agent:
-               Records which application code is executed during the tests.
-
-             report:
-               Generates target/site/jacoco/index.html and jacoco.csv.
-
-             coverage-gate:
-               Runs during Maven verify and fails the build when the overall
-               backend bundle does not meet the required coverage thresholds.
-             ============================================================================
-            -->
+            <!-- ADV155 — `mvn liquibase:validate` has to be told which changelog
+                 to parse; without this the goal aborts with "The changeLogFile
+                 must be specified". Version is managed by spring-boot-dependencies. -->
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <configuration>
+                    <changeLogFile>src/main/resources/db/changelog/db.changelog-master.xml</changeLogFile>
+                </configuration>
+            </plugin>
+            <!-- ADV046 / ADV156 — JaCoCo coverage gate (>=85%) -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
