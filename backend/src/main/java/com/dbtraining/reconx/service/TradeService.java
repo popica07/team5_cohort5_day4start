@@ -1,5 +1,6 @@
 package com.dbtraining.reconx.service;
 
+import com.dbtraining.reconx.dto.MonthlyTradeStats;
 import com.dbtraining.reconx.dto.TradeRequest;
 import com.dbtraining.reconx.exception.DuplicateTradeRefException;
 import com.dbtraining.reconx.exception.TradeNotFoundException;
@@ -18,6 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import static com.dbtraining.reconx.repository.TradeSpecifications.*;
@@ -171,5 +177,61 @@ public Trade update(Long id, TradeRequest req, String actor) {
                 .and(hasStatus(status))
                 .and(hasCounterparty(counterpartyId));
         return tradeRepo.findAll(spec, pageable);
+    }
+
+    /**
+     * TICKET-ADV131 — trade counts for the twelve months of {@code year},
+     * for the dashboard line chart.
+     *
+     * Always returns twelve points in calendar order: the SQL only reports
+     * months that have trades, so the empty ones are padded here rather than
+     * left to the chart to interpolate.
+     */
+    @Transactional(readOnly = true)
+    public MonthlyTradeStats monthlyStats(int year) {
+        LocalDate from = LocalDate.of(year, 1, 1);
+        LocalDate to = from.plusYears(1).minusDays(1);
+
+        long[] counts = new long[12];
+        for (Object[] row : tradeRepo.countByMonthBetween(from, to)) {
+            int month = ((Number) row[0]).intValue();
+            if (month >= 1 && month <= 12) {
+                counts[month - 1] = ((Number) row[1]).longValue();
+            }
+        }
+
+        List<MonthlyTradeStats.MonthPoint> months = new ArrayList<>(12);
+        long total = 0;
+        for (int m = 1; m <= 12; m++) {
+            months.add(new MonthlyTradeStats.MonthPoint(
+                    m,
+                    Month.of(m).getDisplayName(TextStyle.SHORT, Locale.ENGLISH),
+                    counts[m - 1]));
+            total += counts[m - 1];
+        }
+
+        return new MonthlyTradeStats(year, total, availableYears(year), months);
+    }
+
+    /**
+     * Every year from the earliest trade to the latest, newest first. The
+     * requested year and the current year are always offered even when
+     * neither has any trades, so the picker can never render a selected
+     * option that isn't in its own list.
+     */
+    private List<Integer> availableYears(int requestedYear) {
+        var bounds = tradeRepo.findTradeDateBounds();
+        LocalDate min = bounds.isEmpty() ? null : (LocalDate) bounds.getFirst()[0];
+        LocalDate max = bounds.isEmpty() ? null : (LocalDate) bounds.getFirst()[1];
+
+        int thisYear = LocalDate.now().getYear();
+        int lo = Math.min(Math.min(requestedYear, thisYear), min == null ? thisYear : min.getYear());
+        int hi = Math.max(Math.max(requestedYear, thisYear), max == null ? thisYear : max.getYear());
+
+        List<Integer> years = new ArrayList<>(hi - lo + 1);
+        for (int y = hi; y >= lo; y--) {
+            years.add(y);
+        }
+        return years;
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -49,4 +50,40 @@ public interface TradeRepository
                               Pageable pageable);
 
     long countByStatus(String status);
+
+    /**
+     * TICKET-ADV131 — trades per calendar month, aggregated in SQL.
+     *
+     * Returns one row per month that actually has trades, as
+     * {@code [monthNumber, count]}; months with no trades are simply absent
+     * and the service pads them to zero. Both columns come back as some
+     * {@link Number} subtype — H2 and PostgreSQL disagree on the exact type
+     * EXTRACT yields — so callers must widen rather than cast to Integer.
+     *
+     * The entity's @SQLRestriction applies here too, so soft-deleted trades
+     * are excluded from the counts.
+     */
+    @Query("""
+        SELECT EXTRACT(MONTH FROM t.tradeDate), COUNT(t)
+        FROM Trade t
+        WHERE t.tradeDate BETWEEN :from AND :to
+        GROUP BY EXTRACT(MONTH FROM t.tradeDate)
+        ORDER BY EXTRACT(MONTH FROM t.tradeDate)
+        """)
+    List<Object[]> countByMonthBetween(@Param("from") LocalDate from,
+                                       @Param("to") LocalDate to);
+
+    /**
+     * TICKET-ADV131 — earliest and latest trade date as {@code [min, max]},
+     * used to build the year picker's options. Deliberately not a DISTINCT
+     * EXTRACT(YEAR ...): a contiguous min..max range reads better in a
+     * dropdown than a list with holes in it, and this stays portable SQL.
+     * Both slots are null when the table is empty.
+     *
+     * Typed as a List even though the aggregate always yields exactly one row:
+     * a bare {@code Object[]} return type is ambiguous to Spring Data, which
+     * then cannot tell "one row of two columns" from "two single-column rows".
+     */
+    @Query("SELECT MIN(t.tradeDate), MAX(t.tradeDate) FROM Trade t")
+    List<Object[]> findTradeDateBounds();
 }

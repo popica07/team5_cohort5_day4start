@@ -35,6 +35,7 @@ async function request(method, path, body) {
 export const api = {
   login: (email, password)   => request('POST',   '/auth/login', { email, password }),
   listTrades: (params = '')  => request('GET',    `/v1/trades${params ? `?${params}` : ''}`),
+  monthlyTradeStats: (year)  => request('GET',    `/v1/trades/stats/monthly${year ? `?year=${year}` : ''}`),
   createTrade: (req)         => request('POST',   '/v1/trades', req),
   updateStatus: (id, status) => request('PATCH',  `/v1/trades/${id}/status`, { status }),
   deleteTrade: (id)          => request('DELETE', `/v1/trades/${id}`),
