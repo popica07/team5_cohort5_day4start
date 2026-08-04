@@ -18,7 +18,10 @@
 
 FROM eclipse-temurin:25-jdk AS build
 WORKDIR /workspace
-COPY pom.xml mvnw ./
+# checkstyle.xml + suppressions.xml are needed at build time: the Checkstyle
+# plugin binds to `validate`, so it runs as part of `package` below and fails
+# the build if its config isn't in the image.
+COPY pom.xml mvnw checkstyle.xml suppressions.xml ./
 COPY .mvn .mvn
 RUN ./mvnw -q -B dependency:go-offline || true
 COPY src src
