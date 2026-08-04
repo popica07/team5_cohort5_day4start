@@ -60,7 +60,7 @@ services:
 
   backend:
     build: ./backend
-    image: ghcr.io/sidoncode/reconx-backend:latest
+    image: ghcr.io/popica07/reconx-backend:latest
     container_name: reconx-backend
     depends_on:
       postgres: {condition: service_healthy}
@@ -90,7 +90,7 @@ services:
 
   frontend:
     build: ./frontend
-    image: ghcr.io/sidoncode/reconx-frontend:latest
+    image: ghcr.io/popica07/reconx-frontend:latest
     container_name: reconx-frontend
     depends_on:
       backend: {condition: service_healthy}
