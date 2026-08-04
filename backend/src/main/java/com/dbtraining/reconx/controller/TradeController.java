@@ -1,5 +1,6 @@
 package com.dbtraining.reconx.controller;
 
+import com.dbtraining.reconx.dto.MonthlyTradeStats;
 import com.dbtraining.reconx.dto.PagedResponse;
 import com.dbtraining.reconx.dto.TradeMapper;
 import com.dbtraining.reconx.dto.TradeRequest;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -38,6 +42,10 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/v1/trades")
+// @Validated makes the @Min/@Max on @RequestParam arguments actually fire —
+// without it Spring only validates @Valid @RequestBody objects, and a nonsense
+// ?year=99999 would reach LocalDate.of() and surface as a 500 instead of a 400.
+@Validated
 @Tag(name = "trades", description = "Trade CRUD and search")
 @SecurityRequirement(name = "bearerAuth")
 public class TradeController {
@@ -75,6 +83,18 @@ public class TradeController {
                 service.list(from, to, status, counterpartyId, pageable);
 
         return PagedResponse.from(page, mapper::toResponse);
+    }
+
+    @GetMapping("/stats/monthly")
+    @Operation(summary = "Trade counts for the 12 months of a year — backs the dashboard line chart")
+    public MonthlyTradeStats monthlyStats(
+            @RequestParam(required = false)
+            @Min(value = 1970, message = "year must be 1970 or later")
+            @Max(value = 2999, message = "year must be 2999 or earlier")
+            Integer year) {
+
+        // No year means "this one" — the dashboard's default view.
+        return service.monthlyStats(year != null ? year : LocalDate.now().getYear());
     }
 
     @PostMapping
