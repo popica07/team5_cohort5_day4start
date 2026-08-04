@@ -59,16 +59,18 @@ jobs:
       - name: Liquibase validate
         working-directory: backend
         run: |
-          ./mvnw -q liquibase:validate \
-            -Dliquibase.url="jdbc:postgresql://localhost:5432/reconx_test" \
+          ./mvnw -B liquibase:validate \
+            -Dliquibase.changeLogFile=src/main/resources/db/changelog/db.changelog-master.xml \
+            -Dliquibase.url=jdbc:postgresql://localhost:5432/reconx_test \
             -Dliquibase.username=reconx_user \
-            -Dliquibase.password=reconx_pass
+            -Dliquibase.password=reconx_pass \
+            -Dliquibase.driver=org.postgresql.Driver
 
       # ADV156 — build, run tests, JaCoCo report + 85% gate
       # ADV157 — Checkstyle static analysis (fails on violations)
       - name: Build, test & quality gates
         working-directory: backend
-        run: ./mvnw -q verify -Pci
+        run: ./mvnw -B verify -Pci
 
       - name: Upload JaCoCo report
         if: always()
