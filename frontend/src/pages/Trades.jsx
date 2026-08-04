@@ -6,17 +6,36 @@ import DataTable from '@components/DataTable.jsx';
 import { useDebouncedSearch } from '@hooks/useDebouncedSearch.js';
 import { api } from '@services/apiService.js';
 
+// Column key -> sortable property on the Trade JPA entity. The backend sorts
+// through tradeRepo.findAll(spec, pageable), so these must be entity property
+// names, not the JSON field names the DTO happens to expose.
+const SORT_FIELDS = {
+    tradeRef: 'tradeRef',
+    symbol:   'instrument.symbol',
+    qty:      'quantity',
+    price:    'price',
+    status:   'status',
+};
+
 function Trades() {
     const [search, setSearch] = useState('');
     const debounced = useDebouncedSearch(search, 300);
     const [page, setPage] = useState(0);
+    const [sort, setSort] = useState(null);   // { key, dir } — null uses the backend default
     const [data, setData] = useState({ items: [], totalPages: 0 });
+
+    function handleSortChange(key, dir) {
+        if (!SORT_FIELDS[key]) return;        // column the backend can't sort on
+        setSort({ key, dir });
+        setPage(0);                            // re-sorting reshuffles every page
+    }
 
     useEffect(() => {
         let cancelled = false;
         const params = new URLSearchParams();
         params.set('page', String(page));
         if (debounced) params.set('status', debounced);
+        if (sort) params.set('sort', `${SORT_FIELDS[sort.key]},${sort.dir}`);
 
         api.listTrades(params.toString())
             .then((res) => {
@@ -34,7 +53,9 @@ function Trades() {
             });
 
         return () => { cancelled = true; };
-    }, [page, debounced]);
+    }, [page, debounced, sort]);
+
+    const totalPages = Math.max(1, data.totalPages);
 
     return (
         <section>
@@ -43,9 +64,14 @@ function Trades() {
                 aria-label="Filter by status"
                 placeholder="status filter (PENDING/MATCHED/…)"
                 value={search}
-                onChange={(e) => setSearch(e.target.value.toUpperCase())}
+                onChange={(e) => {
+                    setSearch(e.target.value.toUpperCase());
+                    // A new filter shrinks the result set — staying on page 3
+                    // would ask the server for a page that no longer exists.
+                    setPage(0);
+                }}
             />
-            <DataTable>
+            <DataTable onSortChange={handleSortChange}>
                 <DataTable.Header columns={[
                     { key: 'tradeRef', label: 'Ref' },
                     { key: 'symbol',   label: 'Symbol' },
@@ -65,12 +91,28 @@ function Trades() {
                         </>
                     )}
                 />
-                <DataTable.Pagination
-                    page={page}
-                    totalPages={Math.max(1, data.totalPages)}
-                    onChange={setPage}
-                />
             </DataTable>
+
+            {/* Pagination is server-side here (the fetch above keys off `page`),
+                so we drive our own state rather than DataTable.Pagination, which
+                paginates client-side over the `data` prop we don't pass. */}
+            <nav className="data-table__pagination" aria-label="Pagination">
+                <button
+                    type="button"
+                    disabled={page === 0}
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                >
+                    Previous
+                </button>
+                <span>{page + 1} / {totalPages}</span>
+                <button
+                    type="button"
+                    disabled={page >= totalPages - 1}
+                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                >
+                    Next
+                </button>
+            </nav>
         </section>
     );
 }

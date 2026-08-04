@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ============================================================================
+ TICKET-ADV136 — dlq_messages
+ WHAT:    One row per Kafka message that exhausted its retry budget and was
+          routed to trade-events-dlq by the DeadLetterPublishingRecoverer.
+ WHY:     Kafka DLQ retention is finite and Kafdrop is not an ops workflow.
+          Persisting the quarantine gives operators a queryable record and
+          gives POST /api/v1/admin/dlq/replay something to replay from.
+ ============================================================================
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.27.xsd">
+
+    <changeSet id="009-create-dlq-messages" author="trainer">
+        <createTable tableName="dlq_messages">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="event_id" type="VARCHAR(36)"><constraints nullable="false" unique="true"/></column>
+            <column name="trade_ref" type="VARCHAR(30)"/>
+            <column name="original_topic" type="VARCHAR(100)"><constraints nullable="false"/></column>
+            <!-- `partition` and `offset` are both reserved words in Postgres and
+                 in H2's Postgres mode; using them unquoted here would not parse. -->
+            <column name="partition_no" type="INT"><constraints nullable="false"/></column>
+            <column name="record_offset" type="BIGINT"><constraints nullable="false"/></column>
+            <!-- Unbounded VARCHAR rather than CLOB/TEXT, for the same Hibernate
+                 schema-validation reason documented on audit_log in 006. -->
+            <column name="payload" type="VARCHAR(1000000)"/>
+            <column name="reason" type="VARCHAR(2000)"/>
+            <column name="first_seen" type="TIMESTAMP"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex tableName="dlq_messages" indexName="idx_dlq_messages_trade_ref">
+            <column name="trade_ref"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="dlq_messages"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
