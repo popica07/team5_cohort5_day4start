@@ -1,2 +1,10 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# ...but never for these. `text=auto` normalises to LF in the repo while still
+# checking out CRLF on Windows, which corrupts the shebang of any script that
+# gets executed inside a Linux container: `#!/bin/sh\r` makes the kernel look
+# for an interpreter literally named "/bin/sh\r" and fail with
+# "./mvnw: not found" (exit 127). Pin these to LF in the working tree too.
+mvnw    text eol=lf
+*.sh    text eol=lf

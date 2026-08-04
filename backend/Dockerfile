@@ -9,13 +9,6 @@
 # Docker reports "./mvnw: not found" (exit 127) on Linux.
 # ============================================================================
 
-# ============================================================================
-# TICKET-ADV146 — Spring Boot Dockerfile (multi-stage Maven -> JRE 25 slim)
-#
-# Stage 1: build the JAR with Temurin JDK 25 + Maven.
-# Stage 2: copy ONLY the JAR onto a slim JRE image.
-# ============================================================================
-
 FROM eclipse-temurin:25-jdk AS build
 WORKDIR /workspace
 # checkstyle.xml + suppressions.xml are needed at build time: the Checkstyle
@@ -23,6 +16,10 @@ WORKDIR /workspace
 # the build if its config isn't in the image.
 COPY pom.xml mvnw checkstyle.xml suppressions.xml ./
 COPY .mvn .mvn
+# The actual CRLF strip described in the header. .gitattributes `* text=auto`
+# normalises to LF in the repo, but a Windows checkout materialises CRLF in the
+# working tree — and the working tree is what Docker receives as build context.
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 RUN ./mvnw -q -B dependency:go-offline || true
 COPY src src
 RUN ./mvnw -q -B -DskipTests package && \
