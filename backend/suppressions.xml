@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtd/suppressions_1_2.dtd">
+
+<!--
+ ============================================================================
+ TICKET-ADV157 — Checkstyle suppressions.
+
+ Every entry states WHY. A suppression without a justification is just the
+ plugin turned off somewhere a reviewer cannot see, which is what the ticket
+ forbids.
+
+ Two kinds of entry below:
+
+   SECTION 1 — Structural. Rules that should never apply to these files
+               (generated code, JPA entities, resources). Permanent.
+
+   SECTION 2 — Pre-existing debt. Real violations in files owned by other
+               tickets. Each is pinned to a NAMED FILE, never a directory,
+               so the rule still fires on every other file and on anything
+               new. Clearing an entry is a one-line change once the owning
+               ticket touches that file — the list is meant to shrink.
+
+ ADV157 introduced the gate; it deliberately does not rewrite other people's
+ code the week of the demo. That trade-off is why Section 2 exists.
+ ============================================================================
+-->
+<suppressions>
+
+    <!-- ===== SECTION 1 — structural ===== -->
+
+    <!-- Generated sources. MapStruct writes TradeMapperImpl into
+         target/generated-sources; not authored code, and regenerating it
+         would revert any fix. -->
+    <suppress files="[\\/]target[\\/]" checks=".*"/>
+    <suppress files=".*MapperImpl\.java" checks=".*"/>
+
+    <!-- JPA entities: Hibernate uses field access, and the mapped fields sit
+         alongside the @Column annotations documenting them. VisibilityModifier
+         would push the team toward property access purely to satisfy a style
+         rule, changing persistence behaviour. -->
+    <suppress files="[\\/]repository[\\/]entity[\\/].*\.java" checks="VisibilityModifier"/>
+
+    <!-- Spring @Configuration classes chain long fluent builders
+         (SecurityConfig's filter chain is one ~20-line expression). Splitting
+         it to satisfy LineLength hurts readability. -->
+    <suppress files="[\\/]config[\\/].*\.java" checks="LineLength"/>
+    <suppress files="SecurityConfig\.java" checks="LineLength"/>
+
+    <!-- Liquibase changelogs and CSV seed data are resources, not Java. -->
+    <suppress files="[\\/]resources[\\/]" checks=".*"/>
+
+    <!-- Spring test fixtures declare injection points as package-private
+         fields (`@Autowired MockMvc mockMvc;`) — the convention in the Spring
+         reference and throughout this tree. Private adds no encapsulation in a
+         class the container instantiates. Tests only; production still bound. -->
+    <suppress files="[\\/]src[\\/]test[\\/]" checks="VisibilityModifier"/>
+
+    <!-- Spring Boot's @SpringBootApplication class looks like a utility class
+         to Checkstyle (only a static main), but Spring instantiates it as a
+         bean — a private constructor would break startup. False positive. -->
+    <suppress files="ReconxApplication\.java" checks="HideUtilityClassConstructor"/>
+
+
+    <!-- ===== SECTION 2 — pre-existing debt (clear these as you touch the files) ===== -->
+
+    <!-- Missing trailing newline. Mechanical one-character fix, but it would
+         mean 12 files in this PR belonging to eight other tickets, each
+         producing a diff conflict for whoever has them open. Fix opportunis-
+         tically when next editing the file, then delete its line here. -->
+    <suppress files="config[\\/]OpenApiConfig\.java"        checks="NewlineAtEndOfFile"/>
+    <suppress files="controller[\\/]AuditController\.java"  checks="NewlineAtEndOfFile"/>
+    <suppress files="controller[\\/]ReconController\.java"  checks="NewlineAtEndOfFile"/>
+    <suppress files="controller[\\/]TradeController\.java"  checks="NewlineAtEndOfFile"/>
+    <suppress files="kafka[\\/]AuditEventConsumer\.java"    checks="NewlineAtEndOfFile"/>
+    <suppress files="kafka[\\/]DlqConsumer\.java"           checks="NewlineAtEndOfFile"/>
+    <suppress files="kafka[\\/]KafkaTopicsConfig\.java"     checks="NewlineAtEndOfFile"/>
+    <suppress files="kafka[\\/]TradeEventProducer\.java"    checks="NewlineAtEndOfFile"/>
+    <suppress files="observability[\\/]TradeMetrics\.java"  checks="NewlineAtEndOfFile"/>
+    <suppress files="service[\\/]InstrumentService\.java"   checks="NewlineAtEndOfFile"/>
+    <suppress files="LiquibaseMigrationsIT\.java"           checks="NewlineAtEndOfFile"/>
+    <suppress files="TradeLifecycleIT\.java"                checks="NewlineAtEndOfFile"/>
+
+    <!-- Star imports of packages NOT on the idiomatic allow-list in
+         checkstyle.xml — java.sql, org.slf4j, org.springframework.http,
+         org.junit.jupiter.api, and two of our own packages. All are worth
+         expanding; each expansion is a multi-line import edit in a file owned
+         by another ticket. -->
+    <suppress files="exception[\\/]GlobalExceptionHandler\.java"      checks="AvoidStarImport"/>
+    <suppress files="observability[\\/]DatabaseHealthIndicator\.java" checks="AvoidStarImport"/>
+    <suppress files="service[\\/]TradeService\.java"                  checks="AvoidStarImport"/>
+    <suppress files="TradeLifecycleIT\.java"                          checks="AvoidStarImport"/>
+    <suppress files="ReconciliationEngineTest\.java"                  checks="AvoidStarImport"/>
+
+    <!-- Dead imports. Safe to delete, but deleting them here would put this
+         PR inside two unrelated tickets' files. -->
+    <suppress files="kafka[\\/]DlqConsumer\.java" checks="UnusedImports"/>
+    <suppress files="TradeLifecycleIT\.java"      checks="UnusedImports"/>
+
+    <!-- Multi-line `if` without braces in the Day-2 builder validators. Real
+         findings — exactly the class of thing NeedBraces exists for — but they
+         are ADV021/ADV022's code. -->
+    <suppress files="model[\\/]BondTrade\.java"       checks="NeedBraces"/>
+    <suppress files="model[\\/]DerivativeTrade\.java" checks="NeedBraces"/>
+
+    <!-- DlqMessage is currently a placeholder holding a single static
+         builder() that returns Object.class — it will stop looking like a
+         utility class once ADV134's DLQ work fills it in. -->
+    <suppress files="model[\\/]DlqMessage\.java" checks="HideUtilityClassConstructor"/>
+
+</suppressions>

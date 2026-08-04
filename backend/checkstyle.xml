@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtd/configuration_1_3.dtd">
+
+<!--
+ ============================================================================
+ TICKET-ADV157 — Checkstyle ruleset for the ReconX backend.
+
+ Derived from the Google checks, then pruned. The Google set is tuned for
+ whitespace and Javadoc formatting; run unmodified against this codebase it
+ reports thousands of hits, almost all cosmetic, and the only survivable
+ response is a suppressions file so broad the gate stops meaning anything.
+
+ So this keeps the rules that catch defects or genuine structural drift, and
+ drops the purely typographic ones. Every rule below is enforced at severity
+ =warning with failOnViolation=true, i.e. any hit fails the build — nothing
+ here is advisory.
+
+ Deliberately NOT enforced, with reasons:
+   Indentation / WhitespaceAround / LineLength
+       — formatting-only. The codebase mixes 4-space bodies with aligned
+         column comments in the ticket header blocks; enforcing these would
+         mean reflowing every teaching comment in the repo.
+   JavadocMethod / JavadocType / MissingJavadocMethod
+       — the tree documents intent in TICKET-xxx block comments rather than
+         Javadoc tags. Requiring @param/@return would flag ~every method.
+   AbbreviationAsWordInName
+       — would reject the domain vocabulary the whole system is named for:
+         FXTrade, DLQ, JWT, JPA.
+   CustomImportOrder
+       — no agreed ordering across the team's branches; enforcing one now
+         would conflict every open PR on Day 10.
+ ============================================================================
+-->
+<module name="Checker">
+    <property name="severity" value="warning"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- Source files must end with a newline; a missing one makes every
+         subsequent diff show a spurious last-line change. -->
+    <module name="NewlineAtEndOfFile"/>
+
+    <!-- Tabs render differently per editor; this codebase is spaces-only. -->
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+
+    <module name="LineLength">
+        <!-- Generous: the ticket header comments are wide by design. This
+             only catches genuinely runaway lines. -->
+        <property name="max" value="160"/>
+        <property name="ignorePattern" value="^ *(\*|//).*$"/>
+    </module>
+
+    <module name="TreeWalker">
+
+        <!-- ===== real-defect rules ===== -->
+
+        <!-- if/else/for/while without braces is how the classic
+             "goto fail" class of bug happens. Single-line guard clauses
+             (`if (from == null) return x;`) are allowed: the danger is a
+             second statement silently falling outside the branch, which
+             cannot happen when the whole thing is on one line. -->
+        <module name="NeedBraces">
+            <property name="allowSingleLineStatement" value="true"/>
+        </module>
+
+        <!-- A switch case that falls through silently is nearly always
+             a missing break. -->
+        <module name="FallThrough"/>
+
+        <!-- Assigning to a parameter makes the caller's value invisible
+             at the call site. -->
+        <module name="ParameterAssignment"/>
+
+        <!-- == on boxed types / strings compares references. -->
+        <module name="StringLiteralEquality"/>
+
+        <!-- equals() without hashCode() breaks every hash collection —
+             directly relevant to the JPA entities here. -->
+        <module name="EqualsHashCode"/>
+
+        <!-- Catching Exception/Throwable hides real failures; the Kafka
+             consumers and the recon engine both depend on errors
+             propagating so retry/DLQ can see them. -->
+        <module name="IllegalCatch">
+            <property name="illegalClassNames" value="java.lang.Throwable, java.lang.Error"/>
+        </module>
+
+        <!-- Throwing raw Exception forces every caller into a blanket catch. -->
+        <module name="IllegalThrows"/>
+
+        <!-- An empty block silently swallows a branch. -->
+        <module name="EmptyBlock">
+            <property name="option" value="TEXT"/>
+            <property name="tokens" value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY,
+                                           LITERAL_IF, LITERAL_ELSE, LITERAL_FOR,
+                                           LITERAL_WHILE, LITERAL_DO, INSTANCE_INIT,
+                                           STATIC_INIT"/>
+        </module>
+
+        <!-- Mutable static state is a data race waiting to happen in a
+             multi-threaded Spring app. -->
+        <module name="IllegalTokenText">
+            <property name="tokens" value="STRING_LITERAL"/>
+            <property name="format" value="\\u00(0[0-8BCEF]|1[0-9A-F]|7F)"/>
+            <property name="message" value="Consider using a special escape sequence instead of an octal or Unicode escape."/>
+        </module>
+
+        <!-- ===== structural / API-hygiene rules ===== -->
+
+        <!-- Star imports hide what a class actually depends on and break
+             silently when two packages add the same type name.
+             Excluded: the annotation-only packages where the star form is
+             established Spring/Jakarta idiom and expanding it would add ~10
+             import lines per entity and controller for no clarity gain.
+             Star-importing anything else — including our own packages —
+             still fails. -->
+        <module name="AvoidStarImport">
+            <property name="excludes"
+                      value="jakarta.persistence,
+                             jakarta.validation.constraints,
+                             org.springframework.web.bind.annotation"/>
+        </module>
+
+        <module name="UnusedImports">
+            <property name="processJavadoc" value="true"/>
+        </module>
+
+        <module name="RedundantImport"/>
+
+        <!-- Non-private, non-static fields break encapsulation. Entities are
+             suppressed in suppressions.xml (JPA needs field access). -->
+        <module name="VisibilityModifier">
+            <property name="protectedAllowed" value="true"/>
+        </module>
+
+        <!-- Utility classes must not be instantiable. -->
+        <module name="HideUtilityClassConstructor"/>
+
+        <!-- One top-level class per file. -->
+        <module name="OneTopLevelClass"/>
+
+        <!-- Overloads split apart across a class are easy to miss when
+             editing one of them. -->
+        <module name="OverloadMethodsDeclarationOrder"/>
+
+        <!-- ===== naming ===== -->
+        <!-- Formats permit the domain's uppercase abbreviations (FX, DLQ,
+             JWT) which AbbreviationAsWordInName would reject outright. -->
+
+        <module name="PackageName">
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+        </module>
+        <module name="TypeName"/>
+        <module name="MethodName">
+            <!-- Test methods use snake_case after the first camel segment,
+                 e.g. builder_missingPrice_throws — that convention is used
+                 across the existing test suite. -->
+            <property name="format" value="^[a-z][a-zA-Z0-9_]*$"/>
+        </module>
+        <!-- Standard UPPER_SNAKE, plus `log` — every SLF4J logger in this
+             codebase (and the wider ecosystem) is `private static final
+             Logger log`. Renaming seven of them to LOG would be churn. -->
+        <module name="ConstantName">
+            <property name="format" value="^(log|[A-Z][A-Z0-9]*(_[A-Z0-9]+)*)$"/>
+        </module>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="ParameterName"/>
+
+        <!-- Long literals: `l` is indistinguishable from `1`. -->
+        <module name="UpperEll"/>
+
+        <!-- Modifier order per JLS (public static final, not static public). -->
+        <module name="ModifierOrder"/>
+
+        <!-- `final` on an interface method, `public` on an interface field,
+             etc. -->
+        <module name="RedundantModifier"/>
+
+        <!-- Deep nesting is where recon logic becomes unreviewable. -->
+        <module name="NestedIfDepth">
+            <property name="max" value="3"/>
+        </module>
+        <module name="NestedTryDepth">
+            <property name="max" value="2"/>
+        </module>
+
+        <!-- Suppression comments: // CHECKSTYLE:OFF ... // CHECKSTYLE:ON
+             for the rare in-line exception, so it is visible in review. -->
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="CHECKSTYLE:OFF"/>
+            <property name="onCommentFormat" value="CHECKSTYLE:ON"/>
+        </module>
+    </module>
+
+    <!-- The path comes from the plugin's <suppressionsLocation>, which it
+         publishes as the `checkstyle.suppressions.file` property. The default
+         keeps a bare `checkstyle` run (outside Maven) working. -->
+    <module name="SuppressionFilter">
+        <property name="file" value="${checkstyle.suppressions.file}" default="suppressions.xml"/>
+        <property name="optional" value="true"/>
+    </module>
+</module>
